@@ -1,0 +1,27 @@
+<settings>
+<property name="traceFile" value="/home/farooq/sumoprojects/random/ns2mobility.tcl" />
+<property name="graphFile" value="/home/farooq/sumoprojects/random/randomgraph.xml" />
+<property name="outputFile" value="randomgraphmobility.xml" />
+
+<property name="nodeNum" value="100" />
+<property name="duration" value="183" />
+
+<property name="voltage" value="11.1" />
+<property name="power" value="15" />
+<property name="capacity" value="720" />
+
+<property name="maxSpeed" value="15" />
+
+<property name="uavNum" value="2" />
+<property name="uav0x" value="0" />
+<property name="uav0y" value="0" />
+<property name="uav1x" value="550" />
+<property name="uav1y" value="550" />
+
+<property name="pauseTime" value="2.0" />
+<property name="batteryReplaceTime" value="5.0" />
+
+<property name="cameraWidth" value="10" />
+<property name="cameraHeight" value="20" />
+
+</settings>
