@@ -1,71 +1,20 @@
 <settings>
 
-<property name="traceFile" value="../data/cologne/sumo/ns2mobility.tcl" />
-<property name="graphFile" value="../data/cologne-center-graph.xml" />
-<property name="outputFile" value="cologne-center-radial-6000-80.xml" />
+<property name="traceFile" value="/media/sf_vmshare/ns2mobility.tcl" />
+<property name="outputFile" value="/home/farooq/territory allocation/new/simulation/bfs/colognegraphmobility.xml" />
 
 <property name="nodeNum" value="33945" />
 <property name="nodeSize" value="20" />
-<property name="duration" value="590" />
 <property name="duration" value="3590" />
 
 <property name="voltage" value="11.1" />
-<property name="power" value="15" />
-<property name="capacity" value="6750" />
+<property name="capacity" value="12960" />
 
-<property name="maxSpeed" value="5" />
+<property name="maxSpeed" value="10" />
+<property name="ascendSpeed" value="6" />
+<property name="descendSpeed" value="4" />
 
-
-<property name="uavNum" value="48" />
 <property name="uavSize" value="100" />
-<property name="uav0Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g0.xml" />
-<property name="uav1Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g1.xml" />
-<property name="uav2Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g2.xml" />
-<property name="uav3Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g3.xml" />
-<property name="uav4Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g4.xml" />
-<property name="uav5Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g5.xml" />
-<property name="uav6Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g6.xml" />
-<property name="uav7Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g7.xml" />
-<property name="uav8Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g8.xml" />
-<property name="uav9Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g9.xml" />
-<property name="uav10Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g10.xml" />
-<property name="uav11Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g11.xml" />
-<property name="uav12Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g12.xml" />
-<property name="uav13Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g13.xml" />
-<property name="uav14Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g14.xml" />
-<property name="uav15Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g15.xml" />
-<property name="uav16Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g16.xml" />
-<property name="uav17Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g17.xml" />
-<property name="uav18Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g18.xml" />
-<property name="uav19Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g19.xml" />
-<property name="uav20Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g20.xml" />
-<property name="uav21Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g21.xml" />
-<property name="uav22Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g22.xml" />
-<property name="uav23Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g23.xml" />
-<property name="uav24Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g24.xml" />
-<property name="uav25Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g25.xml" />
-<property name="uav26Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g26.xml" />
-<property name="uav27Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g27.xml" />
-<property name="uav28Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g28.xml" />
-<property name="uav29Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g29.xml" />
-<property name="uav30Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g30.xml" />
-<property name="uav31Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g31.xml" />
-<property name="uav32Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g32.xml" />
-<property name="uav33Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g33.xml" />
-<property name="uav34Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g34.xml" />
-<property name="uav35Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g35.xml" />
-<property name="uav36Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g36.xml" />
-<property name="uav37Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g37.xml" />
-<property name="uav38Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g38.xml" />
-<property name="uav39Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g39.xml" />
-<property name="uav40Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g40.xml" />
-<property name="uav41Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g41.xml" />
-<property name="uav42Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g42.xml" />
-<property name="uav43Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g43.xml" />
-<property name="uav44Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g44.xml" />
-<property name="uav45Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g45.xml" />
-<property name="uav46Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g46.xml" />
-<property name="uav47Graph" value="../data/subgraphs/cologne-center-subgraphs-radial-6000-80/g47.xml" />
 
 <property name="pauseTime" value="2.0" />
 <property name="batteryReplaceTime" value="5.0" />
@@ -74,5 +23,12 @@
 <property name="cameraHeight" value="20" />
 
 <property name="mobilityInterval" value="10" />
+
+<property name="flyAltitude" value="20" />
+<property name="observationAltitude" value="25" />
+<property name="communicationRange" value="1000" />
+
+<property name="fleetFile" value="/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-bfs-3-80/fleet.xml" />
+<property name="selectionStrategy" value="leastvisited" />
 
 </settings>

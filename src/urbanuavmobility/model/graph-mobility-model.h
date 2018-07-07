@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2017 Computer Science Department, FAST-NU, Lahore.
+ * Copyright (c) 2018 Computer Science Department, FAST-NU, Lahore.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -74,7 +74,7 @@ public:
 
   GraphMobilityModel ();
   GraphMobilityModel (char* file);
-  GraphMobilityModel(char* file,double maxSpeed);
+  GraphMobilityModel(char* file,double maxSpeed,string selectionStrategy = "random");
   GraphMobilityModel(char* file,double maxSpeed,float baseX,float baseY);
   void walk();
 

@@ -1,0 +1,91 @@
+<fleet>
+<team>
+<base x='11810.8' y='16631.3'  ip='10.0.11.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g11.xml'  ip='10.0.11.2'  />
+</team>
+<team>
+<base x='11249.3' y='16435.6'  ip='10.0.19.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g19.xml'  ip='10.0.19.2'  />
+</team>
+<team>
+<base x='11321' y='16244.8'  ip='10.0.5.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g5.xml'  ip='10.0.5.2'  />
+</team>
+<team>
+<base x='11989.2' y='17724.5'  ip='10.0.3.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g3.xml'  ip='10.0.3.2'  />
+</team>
+<team>
+<base x='10998.4' y='11738.3'  ip='10.0.20.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g20.xml'  ip='10.0.20.2'  />
+</team>
+<team>
+<base x='14720.5' y='16440.8'  ip='10.0.15.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g15.xml'  ip='10.0.15.2'  />
+</team>
+<team>
+<base x='19492.2' y='17373'  ip='10.0.9.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g9.xml'  ip='10.0.9.2'  />
+</team>
+<team>
+<base x='12795.1' y='17453.8'  ip='10.0.12.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g12.xml'  ip='10.0.12.2'  />
+</team>
+<team>
+<base x='11400.8' y='15892.5'  ip='10.0.17.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g17.xml'  ip='10.0.17.2'  />
+</team>
+<team>
+<base x='17006.8' y='10966.7'  ip='10.0.13.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g13.xml'  ip='10.0.13.2'  />
+</team>
+<team>
+<base x='20961.9' y='14367.8'  ip='10.0.2.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g2.xml'  ip='10.0.2.2'  />
+</team>
+<team>
+<base x='17440' y='14009.9'  ip='10.0.16.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g16.xml'  ip='10.0.16.2'  />
+</team>
+<team>
+<base x='16975.8' y='13126.3'  ip='10.0.6.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g6.xml'  ip='10.0.6.2'  />
+</team>
+<team>
+<base x='16238.6' y='11837.8'  ip='10.0.7.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g7.xml'  ip='10.0.7.2'  />
+</team>
+<team>
+<base x='17728.5' y='15533.5'  ip='10.0.4.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g4.xml'  ip='10.0.4.2'  />
+</team>
+<team>
+<base x='13733.6' y='16696.4'  ip='10.0.10.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g10.xml'  ip='10.0.10.2'  />
+</team>
+<team>
+<base x='20586.1' y='17234.6'  ip='10.0.21.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g21.xml'  ip='10.0.21.2'  />
+</team>
+<team>
+<base x='12205.6' y='16748.8'  ip='10.0.8.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g8.xml'  ip='10.0.8.2'  />
+</team>
+<team>
+<base x='13509.6' y='16915.4'  ip='10.0.18.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g18.xml'  ip='10.0.18.2'  />
+</team>
+<team>
+<base x='18389.2' y='15974.5'  ip='10.0.14.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g14.xml'  ip='10.0.14.2'  />
+</team>
+<team>
+<base x='14007.2' y='11002.6'  ip='10.0.0.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g0.xml'  ip='10.0.0.2'  />
+</team>
+<team>
+<base x='15498.1' y='17662.8'  ip='10.0.1.1'  />
+<uav graph='/home/farooq/territory allocation/new/selected paths/cologne-center-subgraphs-radial-3-80/g1.xml'  ip='10.0.1.2'  />
+</team>
+</fleet>
+

@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2017 Computer Science Department, FAST-NU, Lahore.
+ * Copyright (c) 2018 Computer Science Department, FAST-NU, Lahore.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -59,10 +59,11 @@ GraphMobilityModel::GraphMobilityModel (char* file)
 {
 
      graph.load(file);
-     walk();
+//     walk();
 }
 
-GraphMobilityModel::GraphMobilityModel (char* file,double maxSpeed)
+GraphMobilityModel::GraphMobilityModel (char* file,double maxSpeed,string selectionStrategy)
+:graph(selectionStrategy)
 {
 
      this->maxSpeed = maxSpeed; // m/s
@@ -75,8 +76,8 @@ GraphMobilityModel::GraphMobilityModel (char* file,double maxSpeed)
      currentNodeId = "base";
      nextNodeId = "base";
 
-     cout << "initiating walk" << endl;
-     walk();
+
+//     walk();
 }
 
 GraphMobilityModel::GraphMobilityModel (char* file,double maxSpeed,float baseX,float baseY)
@@ -93,7 +94,7 @@ GraphMobilityModel::GraphMobilityModel (char* file,double maxSpeed,float baseX,f
      graph.load(file);
      graph.setRoot(graph.findNearest(baseX,baseY));
      cout << "initiating walk" << endl;
-     walk();
+//     walk();
 }
 
 int GraphMobilityModel::GetId(){
@@ -137,13 +138,13 @@ Vector GraphMobilityModel::DoGetVelocity (void) const
 }
 
 void GraphMobilityModel::onReached(){
-     graph.markEdge(currentNodeId,nextNodeId);
+     cout << GetId() <<  " reached at " << Simulator::Now() << endl;
+     currentNode = nextNode;     
+     graph.markEdge(currentNodeId,nextNodeId,Simulator::Now().GetSeconds());
      currentNodeId = nextNodeId;
 }
 
 void GraphMobilityModel::reached(){
-     cout << GetId() <<  " reached at " << Simulator::Now() << endl;
-     currentNode = nextNode;
      onReached();
      pause();
 }

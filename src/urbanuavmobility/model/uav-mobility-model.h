@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2017 Computer Science Department, FAST-NU, Lahore.
+ * Copyright (c) 2018 Computer Science Department, FAST-NU, Lahore.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -45,27 +45,40 @@ namespace ns3 {
  * \brief UAV mobility model.
  *
  */
+enum Mode {patrolling = 1, monitoring};
+
 class UavMobilityModel : public GraphMobilityModel
 {
 
 private:
-
+  bool init;
   Ptr<UavEnergyModel> energyModel;
   Ptr<Node> node;
-  double maxDistance;
-  double maxRoundTripDistance;
-  double range;
-  int roundTrips;
-
+  double altitude;
   bool lowEnergyMode;
-
   int numberOfRecharges;
+  Mode mode;
+  Vector monitoringDestination;
+  double ascendSpeed;
+  double descendSpeed;
+
 
   void monitorTraffic();
   void checkReturningToBase();
+  void ascend(void (ns3::UavMobilityModel::* next) ());
+  void ascend(double alt,void (ns3::UavMobilityModel::* next) ());
+  void descend(void (ns3::UavMobilityModel::* next) ());
+  void descend(double alt,void (ns3::UavMobilityModel::* next) ());
+  void move();
+  void observe();
+  void switchBattery();
+  void onBatterySwitched();
+  void onDescentAfterObserve();
+  void moveToMonitoringDestination();
 
 protected:
-  virtual void onReached();
+  virtual void reached();
+  virtual void resume();
   virtual void returnToBase();
   virtual void baseReached();
   virtual void activateLowEnergyMode();
@@ -76,11 +89,18 @@ public:
   static float BATTERY_REPLACE_TIME;
   static int CAMERA_WINDOW_WIDTH;
   static int CAMERA_WINDOW_HEIGHT;
+  static double ALT_FLY;
+  static double ALT_OBS;
 
   static TypeId GetTypeId (void);
   UavMobilityModel();
-  UavMobilityModel(char* file,double maxSpeed,Ptr<UavEnergyModel> energyModel);
-  UavMobilityModel(char* file,double maxSpeed,Ptr<UavEnergyModel> energyModel,float baseX,float baseY);
+  UavMobilityModel(char* file,double maxSpeed,double ascSpeed,double descSpeed,Ptr<UavEnergyModel> energyModel,string selectionStrategy = "random");
+  void start();
+  void go();
+  void stop();
+  void setMode(Mode m);
+  void setMonitoringDestination(Vector& dest);
+  Ptr<UavEnergyModel> getEnergyModel();
   virtual void accept(GraphNode* node);
   virtual ~UavMobilityModel ();
 

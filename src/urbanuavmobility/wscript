@@ -13,8 +13,11 @@ def build(bld):
         'model/Graph.cc',
         'model/GraphNode.cc',
         'model/uav.cc',
+        'model/base.cc',
         'model/uav-energy-model.cc',
         'model/uav-mobility-model.cc',
+        'model/uav-application.cc',
+        'model/uav-mode-header.cc',
         'helper/uav-container.cc',
         'helper/urbanuavmobility-helper.cc',
         ]
@@ -32,8 +35,11 @@ def build(bld):
         'model/GraphNode.h',
         'model/Visitor.h',
         'model/uav.h',
+        'model/base.h',
         'model/uav-energy-model.h',
         'model/uav-mobility-model.h',
+        'model/uav-application.h',
+        'model/uav-mode-header.h',
         'helper/urbanuavmobility-helper.h',
         'helper/uav-container.h',
         ]

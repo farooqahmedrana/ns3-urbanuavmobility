@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2017 Computer Science Department, FAST-NU, Lahore.
+ * Copyright (c) 2018 Computer Science Department, FAST-NU, Lahore.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -40,7 +40,7 @@ class UavEnergyModel : public SimpleDeviceEnergyModel
 public:
   static TypeId GetTypeId (void);
   UavEnergyModel ();
-  UavEnergyModel (Ptr<Node> node,double voltage,double power,int capacity,int motors=4);
+  UavEnergyModel (Ptr<Node> node,double voltage,int capacity);
   virtual ~UavEnergyModel ();
 
   void SetEnergyDepletionCallback (Callback<void> callback);
@@ -48,26 +48,40 @@ public:
   virtual void HandleEnergyDepletion (void);
   virtual void HandleEnergyRecharged (void);
 
-  double GetFlyTime();
-  double GetRemainingTime();
-  double GetEnergy(double voltage,int capacity);
-  double GetCurrent(double voltage,double power);
-  void SetLowBatteryThreshold(double range,double speed);
 
+  double GetEnergy(double voltage,int capacity);
+  double GetCurrent(double energy,double distance,double speed);
+  void SetLowBatteryThreshold(double altfly,double altobs,double spasc,double spdes,double spmov);
+  bool isLow(double dist,double altfly,double spmov,double spdes,double obsTime);
   Ptr<Node> GetMobileNode();
   Ptr<UavEnergyModel> clone();
 
+  void start();
+  void stop();
+  void ascend(double distance,double speed);
+  void descend(double distance,double speed);
+  void move(double altitude,double speed);
+  void hover(double altitude);
+
 protected:
   double voltage;
-  double power;
   int capacity;
-  int motors;
   Ptr<BasicEnergySource> energySource;
 
+  virtual double energyForAscend(double,double);
+  virtual double energyForDescend(double,double);
+  virtual double energyForMove(double,double);
+  virtual double energyForHover(double);
 
+  double getAvailableEnergy();
+  double range(double,double,double,double,double);
+  double distance(double,double,double);
 
+  double getPower(double);
 
 private:
+
+  double interpolate(double x, double xi[], double yi[],int isize, int npoints);
 
   Callback<void> m_energyDepletionCallback;
   Callback<void> m_energyRechargedCallback;

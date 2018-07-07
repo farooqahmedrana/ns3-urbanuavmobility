@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2017 Computer Science Department, FAST-NU, Lahore.
+ * Copyright (c) 2018 Computer Science Department, FAST-NU, Lahore.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -24,6 +24,7 @@
 #include "Visitor.h"
 #include <libxml/parser.h>
 #include <map>
+#include <vector>
 #include <string>
 
 using namespace std;
@@ -34,7 +35,9 @@ class Graph {
 private:
 	map<string,GraphNode*> nodes;
      map<string,int> edgesVisitCount;
+     map<string,vector<double> > edgesVisitTime; // seconds
 	GraphNode* rootNode;
+     string selectionStrategy;
 
 	void parseNodes(xmlNodePtr);
 	void parseEdges(xmlNodePtr);
@@ -43,10 +46,16 @@ private:
 
      string getEdgeId(string from,string to);
 
+     double getAverageIdleness();
+     double getWorstIdleness();
+
+     SelectionStrategy* getSelectionStrategy(string nodeId);     
+
 	GraphNode* stepWalkNode;
 
 public:
 	Graph();
+	Graph(string);
 	void load(char* file);
 	void print();
 	void walk(int steps, Visitor* visitor);
@@ -54,7 +63,8 @@ public:
 	void setRoot(GraphNode* node);
 	GraphNode* getRoot();
 	GraphNode* findNearest(double x,double y);
-     void markEdge(string from,string to);
+     void markEdge(string from,string to,double time);
+     int getEdgeVisitCount(string from,string to);
 
      string stats();
 	virtual ~Graph();

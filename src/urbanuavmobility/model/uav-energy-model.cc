@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2017 Computer Science Department, FAST-NU, Lahore.
+ * Copyright (c) 2018 Computer Science Department, FAST-NU, Lahore.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -45,11 +45,9 @@ UavEnergyModel::GetTypeId (void)
 UavEnergyModel::UavEnergyModel ()
 { }
 
-UavEnergyModel::UavEnergyModel(Ptr<Node> node,double voltage,double power,int capacity,int motors){
+UavEnergyModel::UavEnergyModel(Ptr<Node> node,double voltage,int capacity){
   this->voltage = voltage;
-  this->power = power;
   this->capacity = capacity;
-  this->motors = motors;
   this->SetNode(node);
 
   energySource = CreateObject<BasicEnergySource> ();
@@ -61,15 +59,16 @@ UavEnergyModel::UavEnergyModel(Ptr<Node> node,double voltage,double power,int ca
   energySource->SetAttribute("BasicEnergyHighBatteryThreshold", DoubleValue(1));
   this->SetEnergySource(energySource);
  
-  this->SetCurrentA(GetCurrent(voltage,power));
 }
 
 double UavEnergyModel::GetEnergy(double voltage,int capacity){
   return capacity * voltage;
 }
 
-double UavEnergyModel::GetCurrent(double voltage,double power){
-  return (power * this->motors) / voltage;
+
+double UavEnergyModel::GetCurrent(double energy,double distance,double speed){
+  double time = distance / speed;
+  return energy / (voltage * time);
 }
 
 Ptr<Node> UavEnergyModel::GetMobileNode(){
@@ -77,30 +76,47 @@ Ptr<Node> UavEnergyModel::GetMobileNode(){
 }
 
 Ptr<UavEnergyModel> UavEnergyModel::clone(){
-  Ptr<UavEnergyModel> model = CreateObject<UavEnergyModel>(GetMobileNode(),this->voltage,this->power,this->capacity,this->motors);
+  Ptr<UavEnergyModel> model = CreateObject<UavEnergyModel>(GetMobileNode(),this->voltage,this->capacity);
   return model;
+}
+
+void UavEnergyModel::start(){
+  cout << "start energy supply" << endl;
+  this->SetCurrentA(energyForHover(0)/(voltage));
+  cout << "remaining energy:" << this->energySource->GetRemainingEnergy() << endl;
+}
+
+void UavEnergyModel::stop(){
+  cout << "stop energy supply" << endl;
+  this->SetCurrentA(0);
+  cout << "remaining energy:" << this->energySource->GetRemainingEnergy() << endl;
+}
+
+void UavEnergyModel::ascend(double altitude,double speed){
+  cout << "energy to ascend" << endl;
+  this->SetCurrentA(GetCurrent(energyForAscend(altitude,speed),altitude,speed));
+}
+
+void UavEnergyModel::descend(double altitude,double speed){
+  cout << "energy to descend" << endl;
+  this->SetCurrentA(GetCurrent(energyForDescend(altitude,speed),altitude,speed));
+  cout << "remaining energy:" << this->energySource->GetRemainingEnergy() << endl;
+}
+
+void UavEnergyModel::move(double altitude,double speed){
+  cout << "energy to move" << endl;
+  this->SetCurrentA(GetCurrent(energyForMove(altitude,speed),1,speed));
+}
+
+void UavEnergyModel::hover(double altitude){
+  cout << "energy to hover" << endl;
+  this->SetCurrentA(energyForHover(altitude)/(voltage));
 }
 
 UavEnergyModel::~UavEnergyModel ()
 {
   NS_LOG_FUNCTION (this);
 }
-
-double UavEnergyModel::GetFlyTime(){
-  return energySource->GetInitialEnergy() / (power * motors);
-}
-
-double UavEnergyModel::GetRemainingTime(){
-  return energySource->GetRemainingEnergy() / (power * motors);
-}
-
-void UavEnergyModel::SetLowBatteryThreshold(double range,double speed){
-  double time = range / speed;
-  double energy = GetEnergy(voltage,GetCurrent(voltage,power) * time);
-  energySource->SetAttribute("BasicEnergyLowBatteryThreshold", DoubleValue( (energy / energySource->GetInitialEnergy()) ));
-}
-
-
 
 void
 UavEnergyModel::SetEnergyDepletionCallback (
@@ -156,6 +172,96 @@ UavEnergyModel::HandleEnergyRecharged (void)
     }
 }
 
+double UavEnergyModel::energyForAscend(double height,double speed){
+     return 250 * height / speed;     
+     //return 1;
+}
 
+double UavEnergyModel::energyForDescend(double height,double speed){
+     return 210 * height / speed;
+     //return 1;
+}
+
+double UavEnergyModel::energyForMove(double height,double speed){
+     return getPower(speed)/speed;
+//     return 1;
+}
+
+double UavEnergyModel::energyForHover(double height){
+     return 220;
+     //return 1;
+}
+
+double UavEnergyModel::getAvailableEnergy(){
+     return voltage*capacity;
+}
+
+double UavEnergyModel::range(double altfly,double altobs,double spasc,double spdes,double spmov){
+     return distance(getAvailableEnergy() - energyForAscend(altobs,spasc) - energyForDescend(altobs,spdes),altfly,spmov) / 2;
+}
+
+double UavEnergyModel::distance(double energy,double height,double speed){
+     return energy / energyForMove(height,speed);
+}
+
+void UavEnergyModel::SetLowBatteryThreshold(double altfly,double altobs,double spasc,double spdes,double spmov){
+  double threshold = range(altfly,altobs,spasc,spdes,spmov) * energyForMove(altfly,spmov); 
+  double thresholdRatio = threshold / energySource->GetInitialEnergy();
+  energySource->SetAttribute("BasicEnergyLowBatteryThreshold", DoubleValue( thresholdRatio ));
+}
+
+bool UavEnergyModel::isLow(double dist,double altfly,double spmov,double spdes,double obsTime){
+  double energyLeft = energySource->GetRemainingEnergy() - energyForDescend(altfly,spdes) - energyForHover(altfly) * obsTime;
+  if(distance(energyLeft,altfly,spmov) < dist){
+     cout << "LOW ENERGY: " << energyLeft << endl;
+     return true;
+  }
+
+  return false;
+}
+
+double UavEnergyModel::getPower(double speed){
+     const int size = 12;
+     double measuredSpeed[size] = {0.1,1.8,2.8,5,6,6.8,8,9,9.8,13,15};
+     double measuredPower[size] = {220,220,220,210,206,206,212,214,220,214,280,310};
+     return interpolate(speed,measuredSpeed,measuredPower,size,5);
+}
+
+double UavEnergyModel::interpolate(double x, double xi[], double yi[],  
+              int isize, int npoints) 
+{ 
+     double lambda[isize]; 
+     double y; 
+     int j, is, il; 
+     // check order of interpolation 
+     if (npoints > isize) npoints = isize;     
+     // if x is ouside the xi[] interval  
+     if (x <= xi[0])       return y = yi[0]; 
+     if (x >= xi[isize-1]) return y = yi[isize-1];     
+     // loop to find j so that x[j-1] < x < x[j] 
+     j = 0; 
+     while (j <= isize-1) 
+     { 
+          if (xi[j] >= x) break; 
+          j = j + 1; 
+     } 
+     // shift j to correspond to (npoint-1)th interpolation 
+     j = j - npoints/2; 
+     // if j is ouside of the range [0, ... isize-1] 
+     if (j < 0) j=0; 
+     if (j+npoints-1 > isize-1 ) j=isize-npoints; 
+     y = 0.0; 
+     for (is = j; is <= j+npoints-1; is = is+1) 
+     { 
+          lambda[is] = 1.0; 
+          for (il = j; il <= j+ npoints-1; il = il + 1) 
+          { 
+               if(il != is) lambda[is] = lambda[is]* 
+                                             (x-xi[il])/(xi[is]-xi[il]); 
+          } 
+          y = y + yi[is]*lambda[is]; 
+     } 
+     return y; 
+} 
 
 } // namespace ns3

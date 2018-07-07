@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2017 Computer Science Department, FAST-NU, Lahore.
+ * Copyright (c) 2018 Computer Science Department, FAST-NU, Lahore.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -18,6 +18,7 @@
  * Author: Farooq Ahmed <farooq.ahmad@nu.edu.pk>
  */
 #include "GraphNode.h"
+#include "Graph.h"
 #include "Visitor.h"
 #include <iostream>
 #include <cstdlib>
@@ -28,10 +29,42 @@ using namespace std;
 
 namespace ns3{
 
-GraphNode::GraphNode(string i,double x,double y) {
+
+GraphNode* RandomSelection::select(vector<GraphNode*>& nodes){
+	int randomNumber = rand() % (int) nodes.size();
+	return nodes[randomNumber];
+}
+
+LeastVisitedEdgesSelection::LeastVisitedEdgesSelection(string f,Graph* g){
+     from = f;
+     graph = g;
+}
+
+GraphNode* LeastVisitedEdgesSelection::select(vector<GraphNode*>& nodes){
+     vector<GraphNode*> equalNodes;
+     equalNodes.push_back(nodes[0]);
+
+     for (int i=1; i < (int) nodes.size(); i++){
+          if (graph->getEdgeVisitCount(from,nodes[i]->getId()) < 
+               graph->getEdgeVisitCount(from,equalNodes[0]->getId()) ){
+               equalNodes.clear();
+               equalNodes.push_back(nodes[i]);
+          }
+          else if (graph->getEdgeVisitCount(from,nodes[i]->getId()) ==
+               graph->getEdgeVisitCount(from,equalNodes[0]->getId()) ){
+               equalNodes.push_back(nodes[i]);          
+          }
+     }
+
+     int randomNumber = rand() % (int) equalNodes.size();
+	return equalNodes[randomNumber];
+}
+
+GraphNode::GraphNode(string i,double x,double y,SelectionStrategy* s) {
 	this->id = i;
 	this->x = x;
 	this->y = y;
+     strategy = s;
 }
 
 void GraphNode::print(){
@@ -55,11 +88,11 @@ void GraphNode::walk(int steps,int current,Visitor* visitor){
 }
 
 GraphNode* GraphNode::next(){
-	if(nodes.size() == 0){
+     if(nodes.size() == 0){
 		return this;
 	}
-	int randomNumber = rand() % (int) nodes.size();
-	return nodes[randomNumber];
+
+     return strategy->select(nodes);
 }
 
 string GraphNode::getId(){
@@ -81,7 +114,7 @@ double GraphNode::distance(double x,double y){
 }
 
 GraphNode::~GraphNode() {
-
+     delete strategy;
 }
 
 }

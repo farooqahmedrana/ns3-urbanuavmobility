@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2017 Computer Science Department, FAST-NU, Lahore.
+ * Copyright (c) 2018 Computer Science Department, FAST-NU, Lahore.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -21,7 +21,10 @@
 #define UAV_H_
 
 #include "ns3/node.h"
-
+#include "uav-mobility-model.h"
+#include "ns3/network-module.h"
+#include "uav-application.h"
+#include <string>
 
 using namespace std;
 
@@ -38,6 +41,14 @@ class Uav : public Node {
 public:
      static TypeId GetTypeId (void);
 	Uav();
+     void setup(Ptr<Channel> channel,string ip);
+     void startServer();
+     void start();
+     void launch();
+     void stop();
+     void setMonitoringMode();
+     void setPatrollingMode();
+
 	virtual ~Uav();
 };
 

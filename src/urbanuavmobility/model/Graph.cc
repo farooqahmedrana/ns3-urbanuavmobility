@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2017 Computer Science Department, FAST-NU, Lahore.
+ * Copyright (c) 2018 Computer Science Department, FAST-NU, Lahore.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -26,8 +26,25 @@ using namespace std;
 
 namespace ns3{
 
+
 Graph::Graph() {
+     rootNode = NULL;
 	stepWalkNode = NULL;
+     selectionStrategy = "random";
+}
+
+Graph::Graph(string strategy) {
+     rootNode = NULL;
+	stepWalkNode = NULL;
+     selectionStrategy = strategy;
+}
+
+SelectionStrategy* Graph::getSelectionStrategy(string nodeId){
+     if(selectionStrategy.compare("leastvisited") == 0){
+          return new LeastVisitedEdgesSelection(nodeId,this);
+     }
+
+     return new RandomSelection();
 }
 
 void Graph::load(char* file){
@@ -88,7 +105,8 @@ void Graph::parseNodes(xmlNodePtr root){
 		node = node->next;
 	}
 
-	rootNode = nodes.begin()->second;
+     if (rootNode == NULL)
+     	rootNode = nodes.begin()->second;
 }
 
 void Graph::parseEdges(xmlNodePtr root){
@@ -108,7 +126,15 @@ void Graph::parseNode(xmlNodePtr node){
 	double x = atof((const char*) xmlGetProp(node,(const xmlChar*) "x"));
 	double y = atof((const char*)  xmlGetProp(node,(const xmlChar*) "y"));
 
-	nodes[id] = new GraphNode(id,x,y);
+	//nodes[id] = new GraphNode(id,x,y,new RandomSelection());
+     nodes[id] = new GraphNode(id,x,y,getSelectionStrategy(id));
+
+     if (xmlGetProp(node,(const xmlChar*) "type") == NULL) return;
+
+     string type ((const char*) xmlGetProp(node,(const xmlChar*) "type"));
+     if ( type.compare("base") == 0 ){
+          rootNode = nodes[id];
+     }
 }
 
 void Graph::parseEdge(xmlNodePtr node){
@@ -174,16 +200,66 @@ GraphNode* Graph::findNearest(double x,double y){
 	return node;
 }
 
-void Graph::markEdge(string from,string to){
+void Graph::markEdge(string from,string to, double time){
      string edgeId = getEdgeId(from,to);
      if (edgesVisitCount.count(edgeId) != 0){
-          edgesVisitCount[edgeId]++;     
+          edgesVisitCount[edgeId]++;
+          edgesVisitTime[edgeId].push_back(time);     
      }
 
      string edgeIdReverse = getEdgeId(to,from);
      if (edgesVisitCount.count(edgeIdReverse) != 0){
           edgesVisitCount[edgeIdReverse]++;     
+          edgesVisitTime[edgeId].push_back(time);
      }
+}
+
+int Graph::getEdgeVisitCount(string from,string to){
+     return edgesVisitCount[getEdgeId(from,to)];
+}
+
+double Graph::getAverageIdleness(){
+     double totalIdleTime = 0;     
+     double totalVisits = 0;
+     double lastIdleTime;
+
+     for(map<string,vector<double> >::iterator iter = edgesVisitTime.begin(); iter != edgesVisitTime.end(); iter++){
+          vector<double>& edgeVisitTimes = iter->second;
+
+          lastIdleTime = 0;
+          for(int i=0; i < (int) edgeVisitTimes.size(); i++){
+               totalIdleTime += edgeVisitTimes[i] - lastIdleTime;
+               lastIdleTime = edgeVisitTimes[i];
+          }
+
+          totalVisits += edgeVisitTimes.size();
+     }
+
+     if(totalVisits == 0) return 0;
+     return totalIdleTime / totalVisits;
+}
+
+double Graph::getWorstIdleness(){
+     double idleTime;
+     double lastIdleTime;
+     double worstIdleTime = 0;
+
+     for(map<string,vector<double> >::iterator iter = edgesVisitTime.begin(); iter != edgesVisitTime.end(); iter++){
+          vector<double>& edgeVisitTimes = iter->second;
+
+          lastIdleTime = 0;
+          for(int i=0; i < (int) edgeVisitTimes.size(); i++){
+               idleTime = edgeVisitTimes[i] - lastIdleTime;
+
+               if (idleTime > worstIdleTime){
+                    worstIdleTime = idleTime;
+               }
+
+               lastIdleTime = edgeVisitTimes[i];
+          }
+     }
+
+     return worstIdleTime;
 }
 
 string Graph::stats(){
@@ -197,12 +273,15 @@ string Graph::stats(){
                unvisitedEdges++;
           }
      }
+
      float visitsPerEdges = ((float) totalVisitCount) / edgesVisitCount.size();
      stats << "total visits:" << totalVisitCount << ";" ;
      stats << "visits per edges:" << visitsPerEdges << ";" ;
      stats << "unvisited edges:" << unvisitedEdges << ";" ;
      stats << "total edges:" << edgesVisitCount.size() << ";" ;
      stats << "coverage:" << ((float) (edgesVisitCount.size() - unvisitedEdges) / edgesVisitCount.size()) * 100 << ";";
+     stats << "average idleness:" << getAverageIdleness() << ";";
+     stats << "worst idleness:" << getWorstIdleness() << ";";
      return stats.str();
 }
 
