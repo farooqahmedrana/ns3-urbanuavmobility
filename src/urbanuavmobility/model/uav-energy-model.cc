@@ -204,10 +204,14 @@ double UavEnergyModel::distance(double energy,double height,double speed){
      return energy / energyForMove(height,speed);
 }
 
-void UavEnergyModel::SetLowBatteryThreshold(double altfly,double altobs,double spasc,double spdes,double spmov){
-  double threshold = range(altfly,altobs,spasc,spdes,spmov) * energyForMove(altfly,spmov); 
+void UavEnergyModel::SetLowBatteryThreshold(double threshold){
   double thresholdRatio = threshold / energySource->GetInitialEnergy();
   energySource->SetAttribute("BasicEnergyLowBatteryThreshold", DoubleValue( thresholdRatio ));
+}
+
+void UavEnergyModel::SetLowBatteryThreshold(double altfly,double altobs,double spasc,double spdes,double spmov){
+  double threshold = range(altfly,altobs,spasc,spdes,spmov) * energyForMove(altfly,spmov); 
+  SetLowBatteryThreshold(threshold);
 }
 
 bool UavEnergyModel::isLow(double dist,double altfly,double spmov,double spdes,double obsTime){

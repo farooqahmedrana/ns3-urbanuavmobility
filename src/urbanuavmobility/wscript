@@ -18,6 +18,10 @@ def build(bld):
         'model/uav-mobility-model.cc',
         'model/uav-application.cc',
         'model/uav-mode-header.cc',
+        'model/uav-random-waypoint.cc',
+        'model/uav-srcm.cc',
+        'model/uav-manhattan.cc',
+        'model/Util.cc',
         'helper/uav-container.cc',
         'helper/urbanuavmobility-helper.cc',
         ]
@@ -40,6 +44,10 @@ def build(bld):
         'model/uav-mobility-model.h',
         'model/uav-application.h',
         'model/uav-mode-header.h',
+        'model/uav-random-waypoint.h',
+        'model/uav-srcm.h',
+        'model/uav-manhattan.h',
+        'model/Util.h',
         'helper/urbanuavmobility-helper.h',
         'helper/uav-container.h',
         ]

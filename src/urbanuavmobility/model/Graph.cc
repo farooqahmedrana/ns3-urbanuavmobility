@@ -20,6 +20,7 @@
 #include "Graph.h"
 #include <iostream>
 #include <cstdlib>
+#include <time.h>
 #include <sstream>
 
 using namespace std;
@@ -40,6 +41,7 @@ Graph::Graph(string strategy) {
 }
 
 SelectionStrategy* Graph::getSelectionStrategy(string nodeId){
+     srand(time(NULL));
      if(selectionStrategy.compare("leastvisited") == 0){
           return new LeastVisitedEdgesSelection(nodeId,this);
      }
@@ -284,6 +286,61 @@ string Graph::stats(){
      stats << "worst idleness:" << getWorstIdleness() << ";";
      return stats.str();
 }
+
+bool Graph::lineEdgesIntersect(Vector p1,Vector p2){
+	for(map<string,GraphNode*>::iterator iter = nodes.begin(); iter != nodes.end(); iter++){
+		GraphNode* node = iter->second;
+          if (node->lineEdgesIntersect(p1,p2)){
+               return true;
+          }
+	}
+
+	return false;
+}
+
+bool Graph::pointExists(float x,float y){
+	for(map<string,GraphNode*>::iterator iter = nodes.begin(); iter != nodes.end(); iter++){
+		GraphNode* node = iter->second;
+          if (node->pointExists(x,y)){
+               return true;
+          }
+	}
+
+	return false;
+}
+
+Region Graph::spanningArea(){
+	vector<float> x;
+	vector<float> y;
+	for(map<string,GraphNode*>::iterator iter = nodes.begin(); iter != nodes.end(); iter++){
+		x.push_back(iter->second->getX());
+		y.push_back(iter->second->getY());
+	}
+
+	return Region(Util::min(x),Util::min(y),Util::max(x),Util::max(y));
+}
+
+vector<Region> Graph::decompose(float w,float l){
+     vector<Region> markedCells;
+	vector<Region> cells = spanningArea().decompose(w,l);
+
+	for(int j=0; j < (int) cells.size(); j++){
+		for(map<string,GraphNode*>::iterator iter = nodes.begin(); iter != nodes.end(); iter++){
+               GraphNode* node = iter->second;
+               if(cells[j].getColor() == 0 &&
+                     node->cellExists(cells[j]) ) {
+
+                    cells[j].mark(1);
+//                    markedCells.push_back(cells[j]);
+               }
+		}
+	}
+
+//	return markedCells;
+     return cells;
+}
+
+
 
 Graph::~Graph() {
 	// TODO Auto-generated destructor stub

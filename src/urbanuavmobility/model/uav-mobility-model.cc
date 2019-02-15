@@ -190,6 +190,9 @@ string UavMobilityModel::getResults(){
 
 void UavMobilityModel::start(){
      energyModel->start();
+     if(init){
+          recordTrajectory();
+     }
 }
 
 void UavMobilityModel::stop(){
@@ -303,6 +306,83 @@ void UavMobilityModel::moveToMonitoringDestination(){
           lastScheduledEvent = Simulator::Schedule(travelDelay, &UavMobilityModel::reached, this);
      }
 }
+
+void
+UavMobilityModel::recordTrajectory ()
+{
+
+  trajectory.push_back(DoGetPosition());
+  Simulator::Schedule (Seconds(1),
+                                 &UavMobilityModel::recordTrajectory, this);
+}
+
+
+void
+UavMobilityModel::printTrajectory()
+{
+     int count = 0;
+     for(int i=0; i < (int) trajectory.size() - 1; i++){
+
+          Vector p1(trajectory[i].x,trajectory[i].y,trajectory[i].z);
+          Vector p2(trajectory[i+1].x,trajectory[i+1].y,trajectory[i+1].z);
+
+          if(graph.lineEdgesIntersect(p1,p2)){
+               count++;
+          }
+
+     }
+     cout << "count:" << count << endl;
+     cout << "trajectory:" << (trajectory.size() - 1) << endl;
+     cout << "oncourse:" << ( 100.0 * count / (trajectory.size()-1) )  << "%" << endl;
+}
+
+void
+UavMobilityModel::printCoverage(float cellwidth,float celllength)
+{
+     int totalrelevantcount = 0,relevantcovered = 0, irrelevantcovered = 0;
+
+     vector<Region> cells = graph.decompose(cellwidth,celllength);
+     for(int i=0; i < (int) cells.size(); i++){
+          if(cells[i].getColor() == 1) {
+               totalrelevantcount++;
+          }
+     }
+
+
+     for(int i=0; i < (int) trajectory.size(); i++){
+          for(int j=0; j < (int) cells.size(); j++){
+               if(cells[j].hasPoint(trajectory[i])) {
+                    if (cells[j].getColor() == 1)
+                         cells[j].mark(2);
+                    else if (cells[j].getColor() == 0)
+                         cells[j].mark(3);
+                    break;
+               }
+          }
+     }
+
+//     int count = 0;
+     for(int i=0; i < (int) cells.size(); i++){
+          if(cells[i].getColor() == 2) {
+               relevantcovered++;
+          }
+          else if (cells[i].getColor() == 3){
+               irrelevantcovered++;
+          }
+     }
+
+     cout << "coverage:" << ( 100.0 * relevantcovered / totalrelevantcount )  << "%" << endl;
+     cout << "deviation:" << ( 100.0 * irrelevantcovered / (relevantcovered+irrelevantcovered) )  << "%" << endl;
+
+     for(int i=0; i < (int) cells.size(); i++){
+          if(cells[i].getColor() == 1) {
+               cells[i].print();
+          }
+     }
+
+}
+
+
 
 UavMobilityModel::~UavMobilityModel ()
 {

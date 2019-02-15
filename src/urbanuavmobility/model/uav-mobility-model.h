@@ -62,6 +62,8 @@ private:
   double ascendSpeed;
   double descendSpeed;
 
+  vector<Vector> trajectory;
+
 
   void monitorTraffic();
   void checkReturningToBase();
@@ -75,6 +77,8 @@ private:
   void onBatterySwitched();
   void onDescentAfterObserve();
   void moveToMonitoringDestination();
+
+  void recordTrajectory();
 
 protected:
   virtual void reached();
@@ -102,6 +106,9 @@ public:
   void setMonitoringDestination(Vector& dest);
   Ptr<UavEnergyModel> getEnergyModel();
   virtual void accept(GraphNode* node);
+
+  void printTrajectory();
+  void printCoverage(float,float);
   virtual ~UavMobilityModel ();
 
 };

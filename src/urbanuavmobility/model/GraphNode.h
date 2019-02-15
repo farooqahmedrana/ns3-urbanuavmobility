@@ -22,6 +22,8 @@
 
 #include <vector>
 #include <string>
+#include "ns3/vector.h"
+#include "Util.h"
 
 using namespace std;
 
@@ -69,6 +71,9 @@ public:
 	double getX();
 	double getY();
 	double distance(double x,double y);
+     bool lineEdgesIntersect(Vector p1,Vector p2);
+     bool pointExists(float x,float y);
+     bool cellExists(Region& cell);
 	virtual ~GraphNode();
 };
 

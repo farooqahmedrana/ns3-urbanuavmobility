@@ -20,6 +20,7 @@
 #include "GraphNode.h"
 #include "Graph.h"
 #include "Visitor.h"
+#include "Util.h"
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
@@ -112,6 +113,61 @@ double GraphNode::distance(double x,double y){
 	double yd = this->y - y;
 	return sqrt(xd*xd + yd*yd);
 }
+
+bool GraphNode::lineEdgesIntersect(Vector p1, Vector p2){
+
+	Vector q1 (getX(),getY(),0);
+
+	for(int i=0; i < (int) nodes.size(); i++){
+          Vector q2(nodes[i]->getX(),nodes[i]->getY(),0);
+
+          if(Util::linesegmentsIntersect(p1,p2,q1,q2)) {
+			return true;
+		}
+	}
+
+     return false;
+}
+
+bool GraphNode::pointExists(float x,float y){
+
+	float x1 = getX();
+	float y1 = getY();
+
+	for(int i=0; i < (int) nodes.size(); i++){
+		float x2 = nodes[i]->getX();
+		float y2 = nodes[i]->getY();
+
+		float m = (y2-y1) / (x2-x1);
+		float c = y1 - (m*x1);
+
+		if (x >= x1 && x <= x2 && y >= y1 && y <= y2 &&
+				abs(y - (m*x + c)) < 10){
+			return true;
+		}
+	}
+
+     return false;
+}
+
+bool GraphNode::cellExists(Region& cell){
+     Vector p1(getX(),getY(),0);
+
+     for(int i=0; i < (int) nodes.size(); i++){
+          Vector p2( nodes[i]->getX(), nodes[i]->getY(),0);
+
+          if(  Util::linesegmentsIntersect(p1,p2,cell.getTopLeft(),cell.getTopRight() ) ||
+		     Util::linesegmentsIntersect(p1,p2,cell.getTopLeft(),cell.getBottomLeft() ) ||
+		     Util::linesegmentsIntersect(p1,p2,cell.getTopRight(),cell.getBottomRight() ) ||
+		     Util::linesegmentsIntersect(p1,p2,cell.getBottomLeft(),cell.getBottomRight() )
+          ){
+	          return true;
+          }
+     }
+
+     return false;
+}
+
 
 GraphNode::~GraphNode() {
      delete strategy;

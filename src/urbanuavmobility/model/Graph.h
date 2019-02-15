@@ -26,6 +26,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include "Util.h"
 
 using namespace std;
 
@@ -65,7 +66,10 @@ public:
 	GraphNode* findNearest(double x,double y);
      void markEdge(string from,string to,double time);
      int getEdgeVisitCount(string from,string to);
-
+     bool lineEdgesIntersect(Vector p1,Vector p2);
+     bool pointExists(float x,float y);
+     Region spanningArea();
+     vector<Region> decompose(float w,float l);     
      string stats();
 	virtual ~Graph();
 };

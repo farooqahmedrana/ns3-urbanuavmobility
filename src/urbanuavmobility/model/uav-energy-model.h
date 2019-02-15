@@ -51,6 +51,7 @@ public:
 
   double GetEnergy(double voltage,int capacity);
   double GetCurrent(double energy,double distance,double speed);
+  void SetLowBatteryThreshold(double energy);
   void SetLowBatteryThreshold(double altfly,double altobs,double spasc,double spdes,double spmov);
   bool isLow(double dist,double altfly,double spmov,double spdes,double obsTime);
   Ptr<Node> GetMobileNode();
