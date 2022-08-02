@@ -49,6 +49,7 @@ private:
 
      double getAverageIdleness();
      double getWorstIdleness();
+     string getEdgeCoverageTimings();
 
      SelectionStrategy* getSelectionStrategy(string nodeId);     
 
@@ -65,12 +66,14 @@ public:
 	GraphNode* getRoot();
 	GraphNode* findNearest(double x,double y);
      void markEdge(string from,string to,double time);
+     void markEdge(string from,string to,double time,int count);
      int getEdgeVisitCount(string from,string to);
      bool lineEdgesIntersect(Vector p1,Vector p2);
      bool pointExists(float x,float y);
      Region spanningArea();
      vector<Region> decompose(float w,float l);     
      string stats();
+     string getEdgesVisitCount();
 	virtual ~Graph();
 };
 

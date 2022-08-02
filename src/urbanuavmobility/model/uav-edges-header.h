@@ -17,48 +17,54 @@
  *
  * Author: Farooq Ahmed <farooq.ahmad@nu.edu.pk>
  */
-#ifndef UAV_H_
-#define UAV_H_
 
-#include "ns3/node.h"
-#include "uav-mobility-model.h"
-#include "ns3/network-module.h"
-#include "uav-application.h"
+#ifndef UAV_EDGES_HEADER_H
+#define UAV_EDGES_HEADER_H
+
+#include "ns3/header.h"
+#include "ns3/nstime.h"
 #include <string>
 
 using namespace std;
 
-namespace ns3{
-
+namespace ns3 {
 /**
  * \ingroup mobility
- * \brief UAV mobility model.
+ * \class UavModeHeader
+ * \brief Packet header for UDP client/server application.
  *
+ * The header contains mode code
  */
-
-class Uav : public Node {
-private:
-     Ptr<UavApplication> app;
-     int broadcastFrequency;
-
+class UavEdgesHeader : public Header
+{
 public:
-     static TypeId GetTypeId (void);
-	Uav();
-     void setup(Ptr<Channel> channel,string ip);
-     void startServer();
-     void start();
-     void launch();
-     void launch(string baseIp);
-     void stop();
-     void setMonitoringMode();
-     void setPatrollingMode();
-     void sendEdgesInfo();
-     void handleEdgesInfo(string edges);
-     void setBroadcastFrequency(int);
+  UavEdgesHeader ();
 
-	virtual ~Uav();
+  /**
+   * \param seq the sequence number
+   */
+  void SetEdges (string );
+  /**
+   * \return the sequence number
+   */
+  string GetEdges (void) const;
+
+  /**
+   * \brief Get the type ID.
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId (void);
+
+  virtual TypeId GetInstanceTypeId (void) const;
+  virtual void Print (std::ostream &os) const;
+  virtual uint32_t GetSerializedSize (void) const;
+  virtual void Serialize (Buffer::Iterator start) const;
+  virtual uint32_t Deserialize (Buffer::Iterator start);
+
+private:
+  string edges; //!< Mode
 };
 
-}
+} // namespace ns3
 
-#endif /* UAV_H_ */
+#endif /* UAV_EDGES_HEADER_H */

@@ -106,9 +106,11 @@ public:
   void setMonitoringDestination(Vector& dest);
   Ptr<UavEnergyModel> getEnergyModel();
   virtual void accept(GraphNode* node);
-
+  string getEdgesVisitCount();
   void printTrajectory();
   void printCoverage(float,float);
+  void mergeMobilityData(string);
+  
   virtual ~UavMobilityModel ();
 
 };

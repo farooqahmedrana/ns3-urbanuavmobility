@@ -30,6 +30,8 @@
 #include "ns3/system-thread.h"
 
 #include <cstdlib>
+#include <cstring>
+#include <vector>
 
 namespace ns3 {
 
@@ -382,7 +384,42 @@ UavMobilityModel::printCoverage(float cellwidth,float celllength)
 
 }
 
+string
+UavMobilityModel::getEdgesVisitCount(){
+     return graph.getEdgesVisitCount();
+}
 
+void
+UavMobilityModel::mergeMobilityData(string edges){
+//     cout << edges << endl;
+     vector<char*> tokens;
+     char* token = strtok((char*)edges.c_str(),";");
+     while (token != NULL){
+          tokens.push_back(token);
+          token = strtok(NULL,";");
+     }
+
+     for(unsigned int i=0; i < tokens.size(); i++){
+          char* left = strtok(tokens[i],":");
+          char* right = NULL;
+          if (left != NULL){
+               right = strtok(NULL,":");
+          }
+          if (right != NULL){
+               int count = atoi(right);
+               char* from = strtok(left,"->");
+               char* to = NULL;
+               
+               if (from != NULL){
+                    to = strtok(NULL,"->");
+                    
+                    if (graph.getEdgeVisitCount(from,to) < count){
+                         graph.markEdge(from,to,Simulator::Now().GetSeconds(),count);
+                    }
+               }
+          }
+     }
+}
 
 UavMobilityModel::~UavMobilityModel ()
 {

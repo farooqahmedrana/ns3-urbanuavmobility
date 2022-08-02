@@ -23,7 +23,9 @@
 #include "ns3/address.h"
 #include "ns3/application.h"
 #include "ns3/ptr.h"
+#include <string>
 
+using namespace std;
 
 namespace ns3 {
 
@@ -92,6 +94,8 @@ public:
    * \brief Send a packet
    */
   void SendPacket ();
+  void BroadcastPacket ();
+  void setEdges(string e);
 
 protected:
   virtual void DoDispose (void);
@@ -101,7 +105,10 @@ private:
   virtual void StopApplication (void);     // Called at time specified by Stop
 
   void HandleRead (Ptr<Socket> socket);
+  void HandleBroadcastRead (Ptr<Socket> socket);
   void updateMode(uint32_t mode);
+
+
 
 
   Ptr<Socket>     m_socket_local;       //!< Associated socket
@@ -109,6 +116,10 @@ private:
   Address         m_peer;               //!< Peer address
   TypeId          m_tid;                //!< Type of the socket used
   uint32_t         currentMode;
+  string          edgesInfo;
+
+  Ptr<Socket> broadcast_source;
+  Ptr<Socket> broadcast_sink;
 };
 
 } // namespace ns3

@@ -212,9 +212,24 @@ void Graph::markEdge(string from,string to, double time){
      string edgeIdReverse = getEdgeId(to,from);
      if (edgesVisitCount.count(edgeIdReverse) != 0){
           edgesVisitCount[edgeIdReverse]++;     
-          edgesVisitTime[edgeId].push_back(time);
+          edgesVisitTime[edgeIdReverse].push_back(time);
      }
 }
+
+void Graph::markEdge(string from,string to, double time, int count){
+     string edgeId = getEdgeId(from,to);
+     if (edgesVisitCount.count(edgeId) != 0){
+          edgesVisitCount[edgeId] = count;
+          edgesVisitTime[edgeId].push_back(time);     
+     }
+
+     string edgeIdReverse = getEdgeId(to,from);
+     if (edgesVisitCount.count(edgeIdReverse) != 0){
+          edgesVisitCount[edgeIdReverse] = count;     
+          edgesVisitTime[edgeIdReverse].push_back(time);
+     }
+}
+
 
 int Graph::getEdgeVisitCount(string from,string to){
      return edgesVisitCount[getEdgeId(from,to)];
@@ -264,6 +279,23 @@ double Graph::getWorstIdleness(){
      return worstIdleTime;
 }
 
+string Graph::getEdgeCoverageTimings(){
+     stringstream result;
+
+     for(map<string,vector<double> >::iterator iter = edgesVisitTime.begin(); iter != edgesVisitTime.end(); iter++){
+          vector<double>& edgeVisitTimes = iter->second;
+          result << "(" << iter->first << "," ;
+          if( ((int) edgeVisitTimes.size()) > 0){
+               result << edgeVisitTimes[0];
+          }
+
+          result << "),";
+     }
+
+     return result.str();
+}
+
+
 string Graph::stats(){
      stringstream stats;
 
@@ -284,6 +316,7 @@ string Graph::stats(){
      stats << "coverage:" << ((float) (edgesVisitCount.size() - unvisitedEdges) / edgesVisitCount.size()) * 100 << ";";
      stats << "average idleness:" << getAverageIdleness() << ";";
      stats << "worst idleness:" << getWorstIdleness() << ";";
+     stats << "edge coverage timings:" << getEdgeCoverageTimings() << ";";
      return stats.str();
 }
 
@@ -338,6 +371,16 @@ vector<Region> Graph::decompose(float w,float l){
 
 //	return markedCells;
      return cells;
+}
+
+string Graph::getEdgesVisitCount(){
+     stringstream stats;
+
+     for(map<string,int>::iterator iter = edgesVisitCount.begin(); iter != edgesVisitCount.end(); iter++){
+          stats << iter->first << ":" << iter->second << ";" ;
+     }
+
+     return stats.str();
 }
 
 

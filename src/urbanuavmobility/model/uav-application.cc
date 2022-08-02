@@ -20,6 +20,9 @@
 
 #include "ns3/log.h"
 #include "ns3/address.h"
+#include "ns3/ipv4.h"
+#include "ns3/ipv4-header.h"
+#include "ns3/ipv4-interface-address.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/inet6-socket-address.h"
 #include "ns3/packet-socket-address.h"
@@ -35,6 +38,7 @@
 #include "ns3/pointer.h"
 #include "uav-application.h"
 #include "uav-mode-header.h"
+#include "uav-edges-header.h"
 #include "uav.h"
 #include <iostream>
 
@@ -68,7 +72,9 @@ UavApplication::GetTypeId (void)
 
 UavApplication::UavApplication ()
   : m_socket_local (0),
-     m_socket_remote (0)
+     m_socket_remote (0),
+     broadcast_source(0),
+     broadcast_sink(0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -86,6 +92,8 @@ UavApplication::DoDispose (void)
 
   m_socket_local = 0;
   m_socket_remote = 0;
+  broadcast_source = 0;
+  broadcast_sink = 0;
   // chain up
   Application::DoDispose ();
 }
@@ -119,6 +127,26 @@ void UavApplication::StartApplication () // Called at time specified by Start
         }
     }
 
+
+   if (!broadcast_sink)
+    {
+      TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
+      broadcast_sink = Socket::CreateSocket (GetNode (), tid);
+      InetSocketAddress localAddr = InetSocketAddress (GetNode()->GetObject<ns3::Ipv4>()->GetAddress(1,0).GetLocal(),9999);
+      broadcast_sink->Bind(localAddr);
+      broadcast_sink->SetRecvCallback (MakeCallback (&UavApplication::HandleBroadcastRead, this));
+    } 
+
+    if (!broadcast_source)
+    {
+      InetSocketAddress broadcastAddr = InetSocketAddress ("255.255.255.255",9999);
+      TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
+      broadcast_source = Socket::CreateSocket (GetNode (), tid);
+      broadcast_source->SetAllowBroadcast(true);
+      broadcast_source->Connect (broadcastAddr);
+    }
+
+
 }
 
 void UavApplication::StopApplication () // Called at time specified by Stop
@@ -145,15 +173,38 @@ if(m_socket_remote != 0)
 
 }
 
+void UavApplication::BroadcastPacket ()
+{
+  NS_LOG_FUNCTION (this);
+
+
+  UavEdgesHeader edgesHeader;
+  edgesHeader.SetEdges(edgesInfo);
+  Ptr<Packet> packet = Create<Packet> ();
+  packet->AddHeader(edgesHeader);  
+
+  broadcast_source->Send (packet);
+
+  NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds ()
+                   << "s uav application broadcast "
+                   <<  packet->GetSize () << " bytes to "
+                   << " port " << 9);
+
+}
+
 
 void UavApplication::SendPacket ()
 {
   NS_LOG_FUNCTION (this);
 
   UavModeHeader header;
+  UavEdgesHeader edgesHeader;
   header.SetMode(1);
+  edgesHeader.SetEdges(edgesInfo);
   Ptr<Packet> packet = Create<Packet> ();
   packet->AddHeader(header);  
+  packet->AddHeader(edgesHeader);  
+
 
   m_socket_remote->Send (packet);
 
@@ -177,12 +228,42 @@ void UavApplication::HandleRead (Ptr<Socket> socket)
     {
       if (packet->GetSize () > 0)
         {
+          UavEdgesHeader edgesHeader;
+          packet->RemoveHeader (edgesHeader);
+          string edges = edgesHeader.GetEdges ();
+          cout << "Edges : " << edges << endl;
+
           UavModeHeader modeHeader;
           packet->RemoveHeader (modeHeader);
           uint32_t mode = modeHeader.GetMode ();
 
           cout << "Mode : " << mode << endl;
-          updateMode(mode);
+//         updateMode(mode);
+       }
+    }
+
+
+}
+
+void UavApplication::HandleBroadcastRead (Ptr<Socket> socket)
+{
+  NS_LOG_FUNCTION (this << socket);
+  Ptr<Packet> packet;
+  Address from;
+  while ((packet = socket->RecvFrom (from)))
+    {
+      if (packet->GetSize () > 0)
+        {
+          UavEdgesHeader edgesHeader;
+          packet->RemoveHeader (edgesHeader);
+          string edges = edgesHeader.GetEdges ();
+//          cout << "Edges : " << edges << endl;
+
+          Ptr<Uav> uav = DynamicCast<Uav>(GetNode());
+          if (uav != 0){
+               uav->handleEdgesInfo(edges);
+          }
+
        }
     }
 
@@ -210,6 +291,11 @@ void UavApplication::updateMode(uint32_t mode){
           }
      }
 }
+
+void UavApplication::setEdges(string e){
+     edgesInfo = e;
+}
+
 
 
 } // Namespace ns3

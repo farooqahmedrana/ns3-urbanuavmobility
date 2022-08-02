@@ -27,6 +27,10 @@
 #include "ns3/internet-module.h"
 #include "ns3/point-to-point-module.h"
 #include "ns3/wifi-module.h"
+#include "ns3/aodv-module.h"
+#include "ns3/olsr-module.h"
+#include "ns3/dsr-module.h"
+#include "ns3/dsdv-module.h"
 #include "ns3/applications-module.h"
 
 #include "ns3/trace-helper.h"
@@ -74,17 +78,36 @@ void Base::setup(Ptr<Channel> channel,string ip){
      YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
      phy.SetChannel (DynamicCast<YansWifiChannel>(channel));
      WifiHelper wifi = WifiHelper::Default ();
-     wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
+//     wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
+     // for adhoc
+     wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager", "DataMode", StringValue ("OfdmRate6Mbps"), "RtsCtsThreshold", UintegerValue (0));
+
      NqosWifiMacHelper mac = NqosWifiMacHelper::Default ();
-     Ssid ssid = Ssid ("ns-3-ssid");
+/*     Ssid ssid = Ssid ("ns-3-ssid");
      mac.SetType ("ns3::ApWifiMac",
                   "Ssid", SsidValue (ssid));
+*/
+     mac.SetType ("ns3::AdhocWifiMac"); // for adhoc
+
      NetDeviceContainer apDevices;
      apDevices = wifi.Install(phy, mac, this);
      Ptr<NetDevice> device = apDevices.Get(0);
 
      InternetStackHelper stack;
+//     AodvHelper aodv;                   // for adhoc
+//     stack.SetRoutingHelper(aodv);      // for adhoc
+     OlsrHelper olsr;
+     stack.SetRoutingHelper(olsr);
+//     DsrMainHelper main;
+//     DsrHelper dsr;
+
+//     DsdvHelper dsdv;
+//     stack.SetRoutingHelper(dsdv);
+
      stack.Install(this);
+
+//     NodeContainer container(this); // for dsr
+//     main.Install(dsr,container); // for dsr
 
      Ptr<Ipv4> ipv4 = this->GetObject<Ipv4> ();
      int32_t interface = ipv4->GetInterfaceForDevice (device);
@@ -97,9 +120,20 @@ void Base::setup(Ptr<Channel> channel,string ip){
       ipv4->AddAddress (interface, ipv4Addr);
       ipv4->SetMetric (interface, 1);
       ipv4->SetUp (interface);
-
+     cout << "IP setup on base" << endl;
+     cout << ipv4->GetAddress(1,0);
      cout << "base created" << endl;
 
+/*
+     UdpEchoServerHelper echoServer (9);
+     ApplicationContainer serverApps = echoServer.Install (this);
+     cout << "echo server installed on base" << endl;
+     serverApps.Start (Seconds(0));
+     cout << "echo server started on base" << endl;
+*/
+     Ptr<UavApplication> app = CreateObject<UavApplication>();
+     AddApplication(app);
+     app->SetStartTime(Seconds(0));
 }
 
 void Base::send(string ip){

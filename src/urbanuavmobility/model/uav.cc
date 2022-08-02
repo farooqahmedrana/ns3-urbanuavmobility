@@ -23,10 +23,15 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
+#include "ns3/aodv-module.h"
+#include "ns3/olsr-module.h"
+#include "ns3/dsr-module.h"
+#include "ns3/dsdv-module.h"
 #include "ns3/point-to-point-module.h"
 #include "ns3/wifi-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/trace-helper.h"
+#include <cmath>
 
 namespace ns3 {
 
@@ -64,19 +69,38 @@ void Uav::setup(Ptr<Channel> channel,string ip){
      YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
      phy.SetChannel (DynamicCast<YansWifiChannel>(channel));
      WifiHelper wifi = WifiHelper::Default ();
-     wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
+//     wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
+     // for adhoc
+     wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager", "DataMode", StringValue ("OfdmRate6Mbps"), "RtsCtsThreshold", UintegerValue (0)); 
+
      NqosWifiMacHelper mac = NqosWifiMacHelper::Default ();
-     Ssid ssid = Ssid ("ns-3-ssid");
-     mac.SetType ("ns3::StaWifiMac",
+//     Ssid ssid = Ssid ("ns-3-ssid");
+/*     mac.SetType ("ns3::StaWifiMac",
                "Ssid", SsidValue (ssid),
                "ActiveProbing", BooleanValue (false));
+*/
+     mac.SetType ("ns3::AdhocWifiMac"); // for adhoc
      NetDeviceContainer staDevices;
      staDevices = wifi.Install (phy, mac, this);
      Ptr<NetDevice> device = staDevices.Get(0);
      cout << "net device installed on uav" << endl;
 
      InternetStackHelper stack;
+//     AodvHelper aodv;                   // for adhoc
+//     stack.SetRoutingHelper(aodv);      // for adhoc
+     OlsrHelper olsr;
+     stack.SetRoutingHelper(olsr);
+//     DsrMainHelper main;
+//     DsrHelper dsr;
+
+//     DsdvHelper dsdv;
+//     stack.SetRoutingHelper(dsdv);
+     
      stack.Install(this);
+
+//     NodeContainer container(this); // for dsr
+//     main.Install(dsr,container); // for dsr
+     
      cout << "internet stack installed on uav" << endl;
 
      Ptr<Ipv4> ipv4 = this->GetObject<Ipv4> ();
@@ -90,8 +114,9 @@ void Uav::setup(Ptr<Channel> channel,string ip){
       ipv4->AddAddress (interface, ipv4Addr);
       ipv4->SetMetric (interface, 1);
       ipv4->SetUp (interface);
+     
      cout << "ip setup on uav" << endl;
-
+     cout << ipv4->GetAddress(1,0);
      cout << "uav created" << endl;
 
 }
@@ -106,7 +131,7 @@ void Uav::startServer(){
      cout << "echo server started on uav" << endl;
 */
 
-     Ptr<UavApplication> app = CreateObject<UavApplication>();
+     app = CreateObject<UavApplication>();
      AddApplication(app);
      app->SetStartTime(Seconds(0));
 }
@@ -119,12 +144,28 @@ void Uav::start(){
 }
 
 void Uav::launch(){
+     launch("10.0.0.1");
+}
+
+void Uav::launch(string baseIp){
      start();
 
      Ptr<UavMobilityModel> model = GetObject<UavMobilityModel>();
      if(model != NULL){
           model->go();
+          Simulator::Schedule(Seconds(broadcastFrequency), &Uav::sendEdgesInfo, this );
      }
+
+/*
+     UdpEchoClientHelper echoClient (Ipv4Address(baseIp.c_str()), 9);
+     echoClient.SetAttribute ("MaxPackets", UintegerValue (3600));
+     echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+     echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+
+     ApplicationContainer app = echoClient.Install(this);
+     app.Start(Seconds(0));
+*/
+
 
 }
 
@@ -152,6 +193,28 @@ void Uav::setPatrollingMode(){
           model->setMode(mode);
      }
 }
+
+void Uav::setBroadcastFrequency(int f){
+     broadcastFrequency = f;
+}
+
+void Uav::sendEdgesInfo(){
+     Ptr<UavMobilityModel> model = GetObject<UavMobilityModel>();
+     if (model != NULL){
+          app->setEdges(model->getEdgesVisitCount());
+
+          Simulator::Schedule (Seconds(rand()%2), &UavApplication::BroadcastPacket, app);
+          Simulator::Schedule (Seconds(broadcastFrequency), &Uav::sendEdgesInfo, this);
+     }
+}
+
+void Uav::handleEdgesInfo(string edges){
+     Ptr<UavMobilityModel> model = GetObject<UavMobilityModel>();
+     if (model != NULL){
+          model->mergeMobilityData(edges);
+     }
+}
+
 
 Uav::~Uav ()
 {
